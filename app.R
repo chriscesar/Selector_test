@@ -1,5 +1,4 @@
 library(shiny)
-library(shinyjs)
 
 op <- c(
   "Bucket of spiders (live)",
@@ -265,7 +264,7 @@ server <- function(input, output, session) {
       )
       
       return()
-    }
+    # }
     
     
     # Store the final stopping position
