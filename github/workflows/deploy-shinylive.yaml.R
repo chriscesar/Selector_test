@@ -1,0 +1,68 @@
+# deploy-shinylive.yaml
+name: Deploy Shinylive app to GitHub Pages
+
+on:
+  push:
+  branches:
+  - main
+
+# Allows you to run the workflow manually
+workflow_dispatch:
+  
+  permissions:
+  contents: read
+pages: write
+id-token: write
+
+concurrency:
+  group: pages
+cancel-in-progress: false
+
+jobs:
+  
+  build:
+  runs-on: ubuntu-latest
+
+steps:
+  
+  - name: Checkout repository
+uses: actions/checkout@v4
+
+- name: Set up R
+uses: r-lib/actions/setup-r@v2
+
+- name: Install Shinylive
+uses: r-lib/actions/setup-r-dependencies@v2
+with:
+  packages: |
+  any::shinylive
+
+- name: Export Shiny app
+shell: Rscript {0}
+run: |
+  shinylive::export(
+    appdir = ".",
+    destdir = "site"
+  )
+
+- name: Setup GitHub Pages
+uses: actions/configure-pages@v5
+
+- name: Upload GitHub Pages artifact
+uses: actions/upload-pages-artifact@v3
+with:
+  path: site
+
+deploy:
+  environment:
+  name: github-pages
+url: ${{ steps.deployment.outputs.page_url }}
+
+runs-on: ubuntu-latest
+needs: build
+
+steps:
+  
+  - name: Deploy to GitHub Pages
+id: deployment
+uses: actions/deploy-pages@v4
