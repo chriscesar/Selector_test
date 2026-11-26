@@ -119,7 +119,12 @@ server <- function(input, output, session) {
         }
         
         # Use dark text on lighter colours
-        text_colour <- if (op[i] %in% c("Moderate", "Poor")) {
+        text_colour <- if (
+          op[i] %in% c(
+            "An exciting trip to Malaga",
+            "A pallet of teeth (assorted)"
+          )
+        ) {
           "#222222"
         } else {
           "#FFFFFF"
