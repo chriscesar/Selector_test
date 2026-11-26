@@ -23,8 +23,6 @@ option_colours <- c(
 
 ui <- shiny::fluidPage(
   
-  shinyjs::useShinyjs(),
-  
   tags$head(
     tags$style(
       HTML("
@@ -264,7 +262,7 @@ server <- function(input, output, session) {
       )
       
       return()
-    # }
+    }
     
     
     # Store the final stopping position
