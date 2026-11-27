@@ -1,24 +1,26 @@
 library(shiny)
 
 op <- c(
-  "Bucket of spiders (live)",
+  "A 1 gallon bucket of spiders (live)",
   "2 weeks in prison",
   "A real ghost",
   "An exciting trip to Malaga",
   "A pallet of teeth (assorted)",
-  "Meet & greet lunch with Brookside's Tinhead"
+  "Meet & greet lunch with Brookside's Tinhead",
+  "2 tickets for `Memories of Woolworths: the musical`"
 )
 
 final_result <- "An exciting trip to Malaga"
 
 # Colours associated with each category
 option_colours <- c(
-  "Bucket of spiders (live)" = "#2166AC",
+  "A 1 gallon bucket of spiders (live)" = "#2166AC",
   "2 weeks in prison" = "sienna",
   "A real ghost" = "#4DAC26",
   "An exciting trip to Malaga" = "#FFD92F",
   "A pallet of teeth (assorted)"     = "#F28E2B",
-  "Meet & greet lunch with Brookside's Tinhead" = "#D73027"
+  "Meet & greet lunch with Brookside's Tinhead" = "#D73027",
+  "2 tickets for `Memories of Woolworths: the musical`" = "#BAE232"
 )
 
 ui <- shiny::fluidPage(
@@ -28,25 +30,25 @@ ui <- shiny::fluidPage(
       HTML("
       
       .selector {
-        width: 300px;
-        margin: 40px auto;
+      width: 500px;
+      max-width: 90%;
+      margin: 20px auto;
       }
       
       .selector-option {
-        padding: 15px;
-        margin: 8px;
-        text-align: center;
-        font-size: 24px;
-        font-weight: 600;
-        border-radius: 10px;
-        
-        /* Non-active categories are muted */
-        opacity: 0.40;
-        
-        transition:
-          transform 0.10s ease,
-          opacity 0.10s ease,
-          box-shadow 0.10s ease;
+      padding: 10px;
+      margin: 5px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      border-radius: 10px;
+      
+      opacity: 0.40;
+      
+      transition:
+      transform 0.10s ease,
+      opacity 0.10s ease,
+      box-shadow 0.10s ease;
       }
       
       /* Highlight the currently selected category */
@@ -66,20 +68,25 @@ ui <- shiny::fluidPage(
   ),
   
   tags$h2(
-    "Congratulations! You have won:",
-    style = "text-align:center;"
+    "You're a winner!",
+    tags$br(),
+    "Spin to claim your prize!",
+    style = "text-align:center;
+    font-weight: bold;"
   ),
-  
-  uiOutput("selector"),
   
   tags$div(
     class = "spin-button",
     actionButton(
       "spin",
-      "Spin",
-      class = "btn-primary btn-lg"
+      "Spin & win!",
+      class = "btn-primary btn-lg",
+      style = "font-weight: bold;"
     )
-  )
+  ),
+  
+  uiOutput("selector")
+  
 )
 
 server <- function(input, output, session) {
@@ -104,6 +111,7 @@ server <- function(input, output, session) {
   
   output$selector <- shiny::renderUI({
     
+    # Get the currently highlighted position
     current <- position()
     
     shiny::tags$div(
@@ -111,18 +119,27 @@ server <- function(input, output, session) {
       
       lapply(seq_along(op), function(i) {
         
-        # Highlight the current option
+        # ---------------------------------------------------
+        # Determine whether this option is currently active
+        # ---------------------------------------------------
+        
         class_name <- if (i == current) {
           "selector-option active"
         } else {
           "selector-option"
         }
         
-        # Use dark text on lighter colours
+        
+        # ---------------------------------------------------
+        # Set text colour
+        # ---------------------------------------------------
+        
+        # Use dark text on lighter background colours
         text_colour <- if (
           op[i] %in% c(
             "An exciting trip to Malaga",
-            "A pallet of teeth (assorted)"
+            "A pallet of teeth (assorted)",
+            "2 tickets for `Memories of Woolworths: the musical`"
           )
         ) {
           "#222222"
@@ -130,12 +147,33 @@ server <- function(input, output, session) {
           "#FFFFFF"
         }
         
+        
+        # ---------------------------------------------------
+        # Get background colour
+        # ---------------------------------------------------
+        
+        # Look up the colour associated with this option.
+        #
+        # Using [ ] rather than [[ ]] means a missing colour
+        # returns NA instead of producing a subscript error.
+        option_colour <- option_colours[op[i]]
+        
+        # If no colour has been defined, use grey
+        if (is.na(option_colour)) {
+          option_colour <- "#808080"
+        }
+        
+        
+        # ---------------------------------------------------
+        # Create option
+        # ---------------------------------------------------
+        
         shiny::tags$div(
           class = class_name,
           
           style = paste0(
             "background-color: ",
-            option_colours[[op[i]]],
+            option_colour,
             "; color: ",
             text_colour,
             ";"
@@ -143,9 +181,11 @@ server <- function(input, output, session) {
           
           op[i]
         )
+        
       })
     )
   })
+  
   
   
   # -------------------------------------------------------
